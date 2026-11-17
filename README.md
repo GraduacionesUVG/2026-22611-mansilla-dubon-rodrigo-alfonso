@@ -50,6 +50,7 @@ El código de este repositorio es una copia del repositorio de investigación p�
    # Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate
    pip install -r requirements.txt
    pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+   pip install lightning   # solo para ejecutar partes de las pruebas y el entrenamiento
    ```
 
 3. Configurar variables de entorno (solo si se van a lanzar corridas en W&B o Kaggle):
@@ -61,14 +62,16 @@ El código de este repositorio es una copia del repositorio de investigación p�
 
 ## Ejecución
 
-Todos los comandos se ejecutan desde `src/`. Estos cuatro verifican el proyecto sin repetir ningún entrenamiento:
+Todos los comandos se ejecutan desde `src/`. Estos dos verifican el proyecto sin repetir ningún entrenamiento:
 
 ```bash
-python tools/setup_git.py          # filtro que guarda los notebooks sin salidas
 python tools/check_repo.py         # nombres, registro, tamaños y secretos
 python tools/reproduce_numbers.py  # recalcula las cifras citadas desde los datos guardados
-python -m pytest tests -q          # pruebas del código
 ```
+
+`python tools/setup_git.py` configura el filtro que guarda los notebooks sin salidas (solo si se van a editar notebooks).
+
+**Pruebas del código** (`python -m pytest tests -q`): requieren `torch` y `lightning`. Parte de la suite necesita la carpeta `var/agent_runs/` y datos locales que no se versionan (se regeneran con las corridas), por lo que en un clon limpio esas pruebas fallan o no se cargan. Resultado de la corrida en un clon limpio: 269 pasadas, 34 fallidas, 12 con error y 68 omitidas. La causa identificada es la falta de esos datos locales; no se revisó cada falla por separado.
 
 `python tools/build_trace.py` regenera `experiments/TRAZA.md`, que cruza cada experimento con su estado, sus corridas y sus notebooks. Para lanzar un experimento, consultar `docs/REPRODUCIR.md` y el `spec.md` de cada carpeta en `experiments/`.
 
